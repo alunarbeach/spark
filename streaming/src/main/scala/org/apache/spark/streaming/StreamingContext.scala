@@ -458,7 +458,7 @@ class StreamingContext private[streaming] (
       queue: Queue[RDD[T]],
       oneAtATime: Boolean = true
     ): InputDStream[T] = {
-    queueStream(queue, oneAtATime, sc.makeRDD(Seq[T](), 1))
+    queueStream(queue, oneAtATime, sc.makeRDD(Seq.empty[T], 1))
   }
 
   /**
@@ -659,8 +659,7 @@ class StreamingContext private[streaming] (
   def stop(stopSparkContext: Boolean, stopGracefully: Boolean): Unit = {
     var shutdownHookRefToRemove: AnyRef = null
     if (LiveListenerBus.withinListenerThread.value) {
-      throw new SparkException(
-        s"Cannot stop StreamingContext within listener thread of ${LiveListenerBus.name}")
+      throw new SparkException(s"Cannot stop StreamingContext within listener bus thread.")
     }
     synchronized {
       // The state should always be Stopped after calling `stop()`, even if we haven't started yet
